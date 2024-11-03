@@ -1,0 +1,58 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Chi tiết sản phẩm{% endblock %}
+
+{% block content %}
+<h1 class="text-center text-info">CHI TIẾT SẢN PHẨM</h1>
+
+<div class="row">
+    <div class="col-md-4 col-xs-12">
+        <img src="{{ sach.hinh_anh }}" class="img-fluid rounded" />
+    </div>
+    <div class="col-md-6 col-xs-12 fs-5">
+        <h2>{{ sach.ten }}</h2>
+        <p><strong>Thể loại: </strong> {{ sach.the_loai }}</p>
+        <p><strong>Giá: </strong>{{ sach.gia }} VNĐ</p>
+        <p><strong>Tác giả: </strong>{{ sach.tac_gia }}</p>
+        <p><strong>Nhà xuất bản: </strong>{{ sach.nxb }}</p>
+    </div>
+</div>
+
+{% if current_user.is_authenticated %}
+<div class="my-4">
+    <textarea class="form-control" rows="5" id="comment" name="text" placeholder="Nội dung bình luận..."></textarea>
+    <button class="btn btn-info mt-2" onclick="addComment({{sach.id}})">Thêm bình luận</button>
+</div>
+{% else %}
+<p>Vui lòng <a href="/login?next=/products/{{sach.id}}">đăng nhập</a> để bình luận!</p>
+{% endif %}
+
+<div id="comments" class="mt-2 container">
+    {% for b in binh_luan %}
+    <div class="row alert alert-info">
+        <div class="col-md-1">
+            <img src="{{b.khach_hang.avatar}}" class="rounded-circle" height="100" width="100"/>
+        </div>
+        <div class="col-md-10 mx-4">
+            <p><strong>Họ tên:</strong> {{ b.khach_hang.nguoi_dung }}</p>
+            <p><strong>Bình luận: </strong>{{ b.binh_luan }}</p>
+            <p>Bình luận lúc: <span class="date">{{ b.ngay_tao }}</span></p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment-with-locales.min.js"></script>
+<script>
+    window.onload = function() {
+        let dates = document.getElementsByClassName("date");
+        for (let d of dates)
+            d.innerText = moment(d.innerText).locale("vi").fromNow()
+    }
+</script>
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/details.js') }}"></script>
+{% endblock %}

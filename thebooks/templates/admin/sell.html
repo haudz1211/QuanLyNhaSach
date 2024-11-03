@@ -1,0 +1,69 @@
+{% extends 'admin/master.html' %}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+{% block body %}
+
+<h1 class="text-center text-info">Bán sách</h1>
+
+<h4 class="text-danger">Nhân viên: {{current_user}}</h4>
+
+<div id="customer-info" class="row my-4 justify-content-start align-items-end">
+    <div class="col-md-3">Nhập số điện thoại khách hàng: <input type="text" class="form-control" id="phone"
+                                                   placeholder="Nhập số điện thoại"></div>
+    <button class="btn btn-success col-md-1 mx-3" for="phone" onclick="findCustomer()">Tìm</button>
+</div>
+
+<div class="row my-4 justify-content-center align-items-end">
+    <div class="col-md-3">Nhập ID của sách: <input type="number" class="form-control" id="sachId"
+                                                   placeholder="Nhập ID của sách"></div>
+    <button class="btn btn-success col-md-2 mx-3" for="sachId" onclick="addOrder()">Thêm sách</button>
+    <button class="btn btn-success col-md-2 mx-3" onclick="pay()">Thanh toán</button>
+</div>
+
+<div class="alert alert-info">
+    <h3>Tổng tiền: <span id="order-amount">{{ "{:,.0f}".format(thong_tin_don_hang.tong_tien) }}</span> VNĐ
+    </h3>
+    <h3>Tổng số lượng: <span id="order-count">{{ thong_tin_don_hang.tong_so_luong }}</span></h3>
+</div>
+
+<table class="table align-middle">
+    <thead>
+    <tr>
+        <th>Mã</th>
+        <th>Sách</th>
+        <th>Thể loại</th>
+        <th>Số lượng</th>
+        <th>Đơn giá</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody id="startRow">
+        {% if 'don_hang' in session %}
+            {% for d in session['don_hang'].values() %}
+                <tr id="book{{d.id}}">
+                    <th class="align-middle">{{ d.id }}</th>
+                    <th class="align-middle">{{ d.ten }}</th>
+                    <th class="align-middle">{{ d.the_loai }}</th>
+                    <th class="align-middle w-25"><input type="number" onblur="updateOrder({{ d.id }}, this)" id="quantity-book{{d.id}}" class="form-control w-100" name="soLuong" id="soLuong" value="{{d.so_luong}}"/></th>
+                    <th class="align-middle">{{ "{:,.0f}".format(d.gia) }}</th>
+                    <th>
+                        <button onclick="deleteOrder({{ d.id }}, this)" class="btn btn-danger">&times;</button>
+                    </th>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+        crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/admin-sell.js') }}"></script>
+{% endblock %}

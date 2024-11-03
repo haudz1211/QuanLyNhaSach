@@ -1,0 +1,51 @@
+{% extends 'layout/base.html' %}
+
+{% block title %} Đăng nhập {% endblock %}
+{% block content %}
+    <div class="py-4 bg-body-tertiar position-relative">
+        <main class="form-signup w-50 m-auto shadow-lg p-5 my-4 bg-body-tertiary rounded bg-light">
+            <form method="post" action="/login" class="container row">
+                <h1 class="border-bottom the-books">The Book</h1>
+                <h1 class="h3 mb-3 fw-normal d-flex justify-content-center">Đăng nhập</h1>
+
+                {% if error_message %}
+                <div class="alert alert-danger">
+                {{ error_message }}
+                </div>
+                {% endif %}
+                <div class="form-floating">
+                    <input type="text" class="form-control my-2" name="username" id="floatingUsername" placeholder="Tên đăng nhập">
+                    <label for="floatingUsername" class="ps-4 py-4">Tên đăng nhập</label>
+                </div>
+                <div class="form-floating">
+                    <input type="password" class="form-control my-2" name="password" id="floatingPassword" placeholder="Mật khẩu">
+                    <label for="floatingPassword" class="ps-4 py-4">Mật khẩu</label>
+                </div>
+    
+                <div class="d-flex justify-content-end mt-3">
+                    <input class="btn btn-primary col-auto py-2" type="submit" value="Đăng nhập"/>
+                </div>
+            </form>
+        </main>
+    </div>
+
+
+    <!-- <div class="modal modal-sheet position-static d-block bg-body-secondary" tabindex="-1" role="dialog"
+        id="modalChoice">
+        <div class="modal-dialog position-absolute top-50 start-50 translate-middle" role="document">
+            <div class="modal-content rounded-3 shadow">
+                <div class="modal-body p-4 text-center">
+                    <h5 class="mb-0">Enable this setting?</h5>
+                    <p class="mb-0">You can always change your mind in your account settings.</p>
+                </div>
+                <div class="modal-footer flex-nowrap p-0">
+                    <button type="button"
+                        class="btn btn-lg btn-link fs-6 text-decoration-none col-6 py-3 m-0 rounded-0 border-end"><strong>Yes,
+                            enable</strong></button>
+                    <button  type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 py-3 m-0 rounded-0"
+                        data-bs-dismiss="modal">No thanks</button>
+                </div>
+            </div>
+        </div>
+    </div> -->
+{% endblock %}

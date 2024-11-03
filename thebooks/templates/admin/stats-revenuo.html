@@ -1,0 +1,86 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+{% if nam != None and thang != None %}
+<h1 class="text-center text-info">THÔNG KÊ THÁNG {{ thang }} NĂM {{ nam }} THEO DOANH THU</h1>
+{% else %}
+<h1 class="text-center text-info">THÔNG KÊ THEO DOANH THU</h1>
+{% endif %}
+
+<div class="row">
+    <div class="col-md-5">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Mã</th>
+                <th>Tên thể loại</th>
+                <th>Doanh thu</th>
+                <th>Số lượt thuê</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for t in thong_ke %}
+            <tr>
+                <td>{{t[0]}}</td>
+                <td>{{t[1]}}</td>
+                <td>{{t[2]}} VNĐ</td>
+                <td>{{t[3]}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-7">
+        <form>
+            <div class="form-group">
+                <div>Năm</div>
+                <input type="number" class="form-control w-25" min="1900" name="nam" step="1"/>
+            </div>
+            <div class="form-group">
+                <div>Tháng</div>
+                <input type="number" class="form-control w-25" min="1" name="thang" max="12" step="1"/>
+            </div>
+            <div>
+                <input type="submit" value="Lọc dữ liệu" class="btn btn-info"/>
+            </div>
+        </form>
+        <canvas id="myChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    window.onload = function () {
+        const ctx = document.getElementById('myChart');
+
+        let data = [];
+        let labels = [];
+
+        {% for t in thong_ke %}
+        labels.push('{{t[1]}}')
+        data.push({{t[2]}});
+        {% endfor %}
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '# Doanh thu',
+                    data: data,
+                    borderWidth: 1,
+                    backgroundColor: ['red', 'green', 'blue', 'gold', 'silver']
+                }]
+            },
+            options: {
+
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

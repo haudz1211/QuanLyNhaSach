@@ -1,0 +1,76 @@
+{% extends 'layout/base.html' %}
+
+{% block title %} Đăng ký {% endblock %}
+{% block content %}
+    <div class="py-4 bg-body-tertiar position-relative">
+        <main class="form-signup w-50 m-auto shadow-lg p-5 my-4 bg-body-tertiary rounded bg-light">
+            <form method="post" action="/register" class="container row" enctype="multipart/form-data">
+                <h1 class="border-bottom the-books">The Book</h1>
+                <h1 class="h3 mb-3 fw-normal d-flex justify-content-center">Đăng kí</h1>
+
+                {% if error_message %}
+                <div class="alert alert-danger">
+                {{ error_message }}
+                </div>
+                {% endif %}
+
+                <div class="form-floating col-md-7 my-2">
+                    <input type="text" class="form-control" name="hoTen" id="floatingName" placeholder="Họ tên">
+                    <label for="floatingName" class="ps-4">Họ tên</label>
+                </div>
+                <div class="form-floating col-md-5 my-2">
+                    <input type="text" class="form-control" name="sdt" id="floatingPhone" placeholder="Số điện thoại">
+                    <label for="floatingPhone" class="ps-4">Số điện thoại</label>
+                </div>
+                <div class="form-floating">
+                    <input type="text" class="form-control my-2" name="username" id="floatingUsername" placeholder="Tên đăng nhập">
+                    <label for="floatingUsername" class="ps-4 py-4">Tên đăng nhập</label>
+                </div>
+                <div class="form-floating">
+                    <input type="password" class="form-control my-2" name="password" id="floatingPassword" placeholder="Mật khẩu">
+                    <label for="floatingPassword" class="ps-4 py-4">Mật khẩu</label>
+                </div>
+                <div class="form-floating">
+                    <input type="password" class="form-control my-2" name="confirm" id="floatingConfirm" placeholder="Nhập lại mật khẩu">
+                    <label for="floatingConfirm" class="ps-4 py-4">Nhập lại mật khẩu</label>
+                </div>
+                <div class="form-floating">
+                    <input type="email" class="form-control my-2" name="email" id="floatingEmail" placeholder="Địa chỉ email">
+                    <label for="floatingEmail" class="ps-4 py-4">Địa chỉ email</label>
+                </div>
+                <div class="form-floating">
+                    <input type="text" class="form-control my-2" name="diaChi" id="floatingAddress" placeholder="Địa chỉ">
+                    <label for="floatingAddress" class="ps-4 py-4">Địa chỉ</label>
+                </div>
+                <div class="form-floating">
+                    <input type="file" accept=".png,.jpg" id="floatingAvatar" name="avatar" class="form-control my-2" placeholder="Avatar">
+                    <label for="floatingAvatar" class="ps-4 py-4">Avatar</label>
+                </div>
+    
+                <div class="d-flex justify-content-end mt-3">
+                    <input class="btn btn-primary col-auto py-2" type="submit" value="Đăng kí"/>
+                </div>
+            </form>
+        </main>
+    </div>
+
+
+    <!-- <div class="modal modal-sheet position-static d-block bg-body-secondary" tabindex="-1" role="dialog"
+        id="modalChoice">
+        <div class="modal-dialog position-absolute top-50 start-50 translate-middle" role="document">
+            <div class="modal-content rounded-3 shadow">
+                <div class="modal-body p-4 text-center">
+                    <h5 class="mb-0">Enable this setting?</h5>
+                    <p class="mb-0">You can always change your mind in your account settings.</p>
+                </div>
+                <div class="modal-footer flex-nowrap p-0">
+                    <button type="button"
+                        class="btn btn-lg btn-link fs-6 text-decoration-none col-6 py-3 m-0 rounded-0 border-end"><strong>Yes,
+                            enable</strong></button>
+                    <button  type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 py-3 m-0 rounded-0"
+                        data-bs-dismiss="modal">No thanks</button>
+                </div>
+            </div>
+        </div>
+    </div> -->
+{% endblock %}

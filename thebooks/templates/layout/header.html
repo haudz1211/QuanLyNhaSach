@@ -1,0 +1,52 @@
+<header class="header">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between py-3">
+            <a href="/thebooks/static" class="logo-link d-flex align-items-center">
+                <img src="../../static/images/book_store.png" alt="Quản Lý Nhà Sách" class="logo">
+                <span class="fs-3 ms-2 text-light">BOOKSTORE</span>
+            </a>
+
+            <nav class="nav">
+                <ul class="d-flex list-unstyled mb-0">
+                    <li><a href="/thebooks/static" class="nav-link">Trang chủ</a></li>
+                    <li class="dropdown">
+                        <a href="javascript:;" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Thể loại</a>
+                        <ul class="dropdown-menu">
+                            {% for t in the_loai %}
+                            <li><a class="dropdown-item" href="/thebooks/static?the_loai_id={{ t.id }}">{{ t.ten }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+
+           <div class="cart-icon">
+            <a href="/gio_hang" class="text-light">
+                <i class="fs-2 fa-solid fa-cart-shopping"></i>
+                <span class="cart-count">{{ thong_tin_gio_hang.tong_so_luong }}</span>
+                <span class="cart-text">Giỏ hàng</span> <!-- Thêm phần tử này -->
+            </a>
+        </div>
+
+
+            {% if current_user.is_authenticated %}
+            <div class="user-menu dropdown">
+                <a href="#" class="d-block text-light dropdown-toggle" data-bs-toggle="dropdown">
+                    <img src="{{ current_user.khach_hang.avatar }}" alt="avatar" width="40" height="40" class="rounded-circle"/>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/ho_so">{{ current_user.ten }}</a></li>
+                    <li><a class="dropdown-item" href="/ho_so">Hồ sơ</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                </ul>
+            </div>
+            {% else %}
+            <div class="auth-buttons">
+                <a href="/login" class="btn btn-outline-light me-2">Login</a>
+                <a href="/register" class="btn btn-warning">Sign-up</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</header>

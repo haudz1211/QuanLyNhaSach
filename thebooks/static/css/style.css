@@ -1,0 +1,136 @@
+@font-face {
+    font-family: RobotoMono;
+    src: url("/static/fonts/RobotoMono-VariableFont_wght.ttf");
+}
+
+@font-face {
+    font-family: WaterBrush;
+    src: url("/static/fonts/WaterBrush-Regular.ttf");
+}
+
+* {
+    font-family: RobotoMono;
+}
+
+.header {
+    background-color: #343a40; /* Màu nền tối cho header */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Đổ bóng cho header */
+}
+
+.logo-link {
+    text-decoration: none; /* Bỏ gạch chân */
+}
+
+.logo {
+    max-width: 60px; /* Đặt kích thước tối đa cho logo */
+    height: auto; /* Giữ tỷ lệ */
+}
+
+.nav {
+    flex-grow: 1; /* Để nav chiếm hết không gian còn lại */
+}
+
+.nav-link {
+    color: #f8f9fa; /* Màu chữ cho các liên kết */
+    padding: 10px 15px; /* Khoảng cách xung quanh các liên kết */
+    transition: background-color 0.3s; /* Hiệu ứng chuyển màu */
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Màu nền khi hover */
+}
+
+.cart-icon {
+    position: relative;
+}
+
+.cart-count {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: #dc3545; /* Màu đỏ cho badge */
+    color: white; /* Màu chữ trắng */
+    padding: 0 5px;
+    border-radius: 50%;
+    font-size: 0.75rem; /* Kích thước chữ cho badge */
+}
+
+.auth-buttons .btn {
+    font-size: 0.9rem; /* Kích thước chữ cho nút */
+}
+
+.the-books {
+    font-family: WaterBrush;
+}
+
+.nav-link {
+    padding: 10px; /* Giữ nguyên padding */
+    margin-left: 5px; /* Thêm margin bên trái và bên phải */
+    transition: background-color 0.3s; /* Hiệu ứng chuyển màu */
+}
+
+
+li > a.nav-link:hover{
+    color: #ffcc00; /* Màu chữ khi hover */
+    scale: 110%;
+    transition: 0.2s linear;
+     border: none; /* Đảm bảo không có border khi hover */
+    outline: none; /* Đảm bảo không có outline khi hover */
+}
+
+li > a.nav-link:focus {
+    scale: 110%;
+      color: #ffcc00; /* Màu chữ khi hover */
+    font-weight: bold;
+    transition: 0.2s linear;
+}
+
+.book-card:hover {
+    scale: 103%;
+    transition: 0.2s linear;
+}
+
+.book-img {
+        width: 100%; /* Để chiều rộng của hình ảnh lấp đầy khung */
+        height: 100%; /* Chiều cao cố định */
+        object-fit: cover; /* Cắt tỉ lệ để phù hợp với kích thước */
+    }
+
+.logo {
+    max-width: 300px; /* Thay đổi kích thước tối đa cho logo */
+    height: 60px; /* Tự động điều chỉnh chiều cao theo tỷ lệ */
+}
+
+.cart-icon {
+    margin-left: 20px; /* Thêm khoảng cách bên trái */
+    margin-right: 50px; /* Thêm khoảng cách bên trái */
+    position: relative; /* Để giữ vị trí của badge */
+}
+
+.cart-count {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: #dc3545; /* Màu đỏ cho badge */
+    color: white; /* Màu chữ trắng */
+    padding: 0 5px; /* Padding cho badge */
+    border-radius: 50%; /* Đường viền tròn cho badge */
+    font-size: 0.75rem; /* Kích thước chữ cho badge */
+}
+.cart-text {
+    display: none; /* Ẩn chữ "Giỏ hàng" theo mặc định */
+    position: absolute; /* Đặt vị trí tuyệt đối */
+    top: 40px; /* Điều chỉnh vị trí chữ */
+    left: 50%; /* Căn giữa theo chiều ngang */
+    transform: translateX(-50%); /* Căn giữa hoàn hảo */
+    background-color: rgba(0, 0, 0, 0.7); /* Màu nền mờ cho chữ */
+    color: white; /* Màu chữ */
+    padding: 5px 10px; /* Padding cho chữ */
+    border-radius: 5px; /* Đường viền tròn cho chữ */
+    white-space: nowrap; /* Không xuống dòng */
+    z-index: 10; /* Đảm bảo chữ hiển thị trên các phần tử khác */
+}
+
+.cart-icon:hover .cart-text {
+    display: block; /* Hiện chữ khi hover */
+}

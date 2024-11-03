@@ -1,0 +1,25 @@
+{% extends 'layout/base.html' %}
+
+{% block title %} Hồ sơ {% endblock %}
+
+{% block content %}
+<h1 class="text-center text-dark my-4">HỒ SƠ</h1>
+<div class="row justify-content-center">
+    <img class="col-md-3" src="{{ current_user.khach_hang.avatar }}"/>
+    <div class=" col-md-5 mx-4 row" id="profile">
+        <input style="display: none" id="input-file" class="form-control col-md-12 my-2" type="file">
+        <input disabled type="text" class="form-control my-2 col-md-12" name="ho_ten" id="ho-ten" value="{{ current_user.ten }}">
+        <input disabled type="text" class="form-control my-2 col-md-12" name="sdt" id="sdt" value="{{ current_user.sdt }}">
+        <input disabled type="email" class="form-control my-2 col-md-12" name="email" id="email" value="{{ current_user.email }}">
+        <input disabled type="text" class="form-control my-2 col-md-12" name="dia_chi" id="dia-chi" value="{{ current_user.dia_chi }}">
+        <div class="col-md-12 row justify-content-center">
+            <button class="btn btn-success col-md-3 mx-2" onclick="edit()">Chỉnh sửa</button>
+            <button class="btn btn-success col-md-2 mx-2" onclick="updateProfile()">Lưu</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'layout/base.html' %}
+
+{% block title %} Giỏ hàng {% endblock %}
+{% block content %}
+<div class="my-4">
+    {% if 'gio_hang' in session %}
+    <div class="row py-2 fs-5 fw-bold">
+        <div class="col-md-2 me-4" style="width: 10rem;">Sản phẩm</div>
+        <div class="col-md-4 row"></div>
+        <div class="col-md-2">Đơn giá</div>
+        <div class="col-md-3">Số lượng</div>
+        <div class="col-md-1"></div>
+    </div>
+    {% for g in session['gio_hang'].values() %}
+    <div id="book{{ g.id }}" class="row py-3 mb-4 shadow-sm bg-body-tertiary rounded align-items-center">
+        <div class="col-md-2 me-4" style="width: 10rem;"><img class="w-100" src="{{ g.hinh_anh }}"></div>
+        <div class="col-md-4 row align-content-center">
+            <span class="py-2 col-md-12">Tên: {{ g.ten }}</span>
+            <span class="py-2 col-md-12">Thể loại: {{ g.the_loai }}</span>
+            <span class="py-2 col-md-12">Tác giả: {{ g.tac_gia }}
+                {% for t in g.tac_gias %}
+                <span>{{ t.ten }}</span>
+                {% endfor %}
+            </span>
+        </div>
+        <div class="col-md-2">{{ "{:,.0f}".format(g.gia) }} VNĐ</div>
+        <div class="col-md-3">
+            <input type="number" onblur="updateCart({{ g.id }}, this)" value="{{ g.so_luong }}"
+                   class="form-control w-auto"/>
+        </div>
+        <div class="col-md-1 justify-content-end">
+            <button class="btn btn-danger" onclick="deleteCart({{ g.id }}, this)">&times;</button>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="alert alert-info">
+        <h3>Tổng tiền: <span class="cart-amount">{{ "{:,.0f}".format(thong_tin_gio_hang.tong_tien) }}</span> VNĐ
+        </h3>
+        <h3>Tổng số lượng: <span class="cart-count">{{ thong_tin_gio_hang.tong_so_luong }}</span></h3>
+    </div>
+
+    <div>
+        {% if current_user.is_authenticated %}
+        <input type="button" onclick="pay()" value="Thanh toán" class="btn btn-success"/>
+        {% else %}
+        <p>Vui lòng <a href="/login?next=/cart">đăng nhập</a> để thanh toán!</p>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">KHÔNG có sản phẩm trong giỏ!</div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+{% endblock %}
