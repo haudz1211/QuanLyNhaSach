@@ -1,0 +1,68 @@
+{% extends 'layout/base.html' %}
+
+{% block title %} Lịch sử Đơn Hàng {% endblock %}
+
+{% block content %}
+<h1 class="my-4 text-center">Lịch sử Đơn Hàng</h1>
+
+{% if don_hangs %}
+    <div class="my-4">
+        {% for don_hang in don_hangs %}
+            <div class="card mb-4 shadow-lg border-light">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Đơn hàng {{ don_hang.id }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Tình trạng:</strong>
+                                {% if don_hang.status.value == 3 %}
+                                    <span class="badge text-bg-success">Đã thanh toán</span>
+                                {% elif don_hang.status.value == 1 %}
+                                    <span class="badge text-bg-warning">Chờ thanh toán</span>
+                                {% elif don_hang.status.value == 2 %}
+                                    <span class="badge text-bg-info">Đang giao</span>
+                                {% elif don_hang.status.value == 4 %}
+                                    <span class="badge text-bg-secondary">Đã hủy</span>
+                                {% endif %}
+
+                            </p>
+                            <p><strong>Ngày thanh toán:</strong> {{ don_hang.ngay_thanh_toan.strftime('%d/%m/%Y %H:%M:%S') }}</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <p class="lead"><strong>Tổng tiền:</strong> {{ don_hang.total_price | format_price }} VNĐ</p>
+                            <button class="btn btn-info" data-bs-toggle="collapse" data-bs-target="#orderDetail{{ don_hang.id }}" aria-expanded="false" aria-controls="orderDetail{{ don_hang.id }}">
+                                <i class="bi bi-eye"></i> Xem Chi Tiết
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chi tiết đơn hàng -->
+                   <div class="collapse mt-3" id="orderDetail{{ don_hang.id }}">
+                        <div class="card card-body shadow-sm">
+                            <h5 class="mb-3 text-primary">Chi tiết các sản phẩm trong đơn hàng:</h5>
+                            <ul class="list-group">
+                                {% for chi_tiet in don_hang.sachs %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center border-0 rounded-3 mb-2 shadow-sm">
+                                        <div class="d-flex align-items-center">
+                                            <strong class="ms-3">{{ chi_tiet.sach.ten }}</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-end align-items-center">
+                                            <span class="badge bg-secondary me-2">Số lượng: {{ chi_tiet.so_luong }}</span>
+                                            <span class="badge bg-success">{{ "{:,.0f}".format(chi_tiet.gia) }} VNĐ</span>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info text-center">Bạn chưa có đơn hàng nào.</div>
+{% endif %}
+
+{% endblock %}

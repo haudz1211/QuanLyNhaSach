@@ -134,3 +134,14 @@ li > a.nav-link:focus {
 .cart-icon:hover .cart-text {
     display: block; /* Hiện chữ khi hover */
 }
+
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid red;
+    background-color: #ffe6e6;
+    border-radius: 5px;
+}

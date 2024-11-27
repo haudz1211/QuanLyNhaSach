@@ -2,51 +2,68 @@
 
 {% block body %}
 {% if nam != None and thang != None %}
-<h1 class="text-center text-info">THÔNG KÊ THÁNG {{ thang }} NĂM {{ nam }} THEO TẦN SUẤT</h1>
+<h1 class="text-center text-info">THỐNG KÊ THÁNG {{ thang }} NĂM {{ nam }} THEO TẦN SUẤT</h1>
 {% else %}
-<h1 class="text-center text-info">THÔNG KÊ THEO TẦN SUẤT</h1>
+<h1 class="text-center text-info">THỐNG KÊ THEO TẦN SUẤT</h1>
 {% endif %}
 
-<div class="row">
-    <div class="col-md-5">
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Mã</th>
-                <th>Tên sách</th>
-                <th>Thể loại</th>
-                <th>Số lượng</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for t in thong_ke %}
-            <tr>
-                <td>{{t[0]}}</td>
-                <td>{{t[1]}}</td>
-                <td>{{t[2]}} VNĐ</td>
-                <td>{{t[3]}}</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="col-md-7">
-        <form>
-            <div class="form-group">
-                <div>Năm</div>
-                <input type="number" class="form-control w-25" min="1900" name="nam" step="1"/>
+<!-- Form lọc với DatePicker -->
+<div class="row mt-5">
+    <div class="col-md-12">
+        <div class="card shadow-lg border-light rounded">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">Lọc dữ liệu theo tháng và năm</h4>
             </div>
-            <div class="form-group">
-                <div>Tháng</div>
-                <input type="number" class="form-control w-25" min="1" name="thang" max="12" step="1"/>
+            <div class="card-body">
+                <form class="form-inline justify-content-center" method="GET">
+                    <div class="form-group mx-3">
+                        <label for="thang-nam" class="mr-3">Chọn tháng và năm:</label>
+                        <input type="month" class="form-control w-25" name="thang_nam" value="{{ nam }}-{{ thang }}" />
+                    </div>
+                    <button type="submit" class="btn btn-outline-info btn-lg">Lọc dữ liệu</button>
+                </form>
             </div>
-            <div>
-                <input type="submit" value="Lọc dữ liệu" class="btn btn-info"/>
-            </div>
-        </form>
-        <canvas id="myChart"></canvas>
+        </div>
     </div>
 </div>
+
+<!-- Kiểm tra nếu không có dữ liệu thống kê -->
+{% if thong_ke | length == 0 %}
+    <div class="alert alert-warning text-center">
+        <strong>Thông báo!</strong> Tháng {{ thang }} năm {{ nam }} không có dữ liệu thống kê.
+    </div>
+{% else %}
+    <!-- Bảng thống kê -->
+    <div class="row mt-5">
+        <div class="col-md-5">
+            <table class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Mã</th>
+                        <th>Tên sách</th>
+                        <th>Thể loại</th>
+                        <th>Số lượng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for t in thong_ke %}
+                <tr>
+                    <td>{{t[0]}}</td>
+                    <td>{{t[1]}}</td>
+                    <td>{{t[2]}}</td>
+                    <td>{{t[3]}}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Biểu đồ thống kê -->
+        <div class="col-md-7">
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
+{% endif %}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -56,9 +73,9 @@
         let data = [];
         let labels = [];
 
-        {%for t in thong_ke %}
-        labels.push('{{t[1]}}');
-        data.push({{t[3]}});
+        {% for t in thong_ke %}
+        labels.push('{{ t[1] }}');  <!-- Tên sách -->
+        data.push({{ t[3] }});      <!-- Số lượng -->
         {% endfor %}
 
         new Chart(ctx, {
@@ -66,14 +83,16 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: '# Số lượng',
+                    label: 'Số lượng bán ra',
                     data: data,
                     borderWidth:  5,
                     borderColor: 'black',
-                    backgroundColor: ['red', 'green', 'blue', 'gold', 'silver']
+                    backgroundColor: ['red', 'green', 'blue', 'gold', 'silver'],
+                    fill: false
                 }]
             },
             options: {
+                responsive: true,
                 scales: {
                     y: {
                         beginAtZero: true
@@ -83,4 +102,5 @@
         });
     }
 </script>
+
 {% endblock %}

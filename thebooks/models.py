@@ -46,11 +46,18 @@ class Sach(BaseModel):
     phieu_nhaps = relationship('ChiTietPhieuNhap', backref='sach', lazy=True)
     khach_hangs = relationship('BinhLuan', backref='sach', lazy=True)
     don_hangs = relationship('ChiTietDonHang', backref='sach', lazy=True)
-    quy_dinh_nhap_sach = relationship('QuyDinhNhapSach', backref='sach', uselist=False, lazy=True)
+    # quy_dinh_nhap_sach = relationship('QuyDinhNhapSach', backref='sach', uselist=False, lazy=True)
 
     def __str__(self):
         return self.ten
 
+
+    def decrease_stock(self, quantity):
+        if self.so_luong >= quantity:
+            self.so_luong -= quantity
+            db.session.commit()
+        else:
+            raise ValueError(f"Số lượng sách '{self.ten}' không đủ trong kho.")
 
 class PhieuNhap(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -76,10 +83,10 @@ class BinhLuan(db.Model):
 
 class UserRole(enum.Enum):
     quan_tri_vien = 1
-    quan_ly = 2
-    quan_ly_kho = 3
-    nhan_vien = 4
-    khach_hang = 5
+    # quan_ly = 2
+    quan_ly_kho = 2
+    nhan_vien = 3
+    khach_hang = 4
 
 
 class NguoiDung(BaseModel, UserMixin):
@@ -87,6 +94,7 @@ class NguoiDung(BaseModel, UserMixin):
     username = Column(String(30), nullable=False, unique=True)
     password = Column(String(200), nullable=False)
     email = Column(String(30), unique=True)
+    hinh_anh = db.Column(db.String(200))
     sdt = Column(String(20), unique=True)
     dia_chi = Column(String(200))
     role = Column(Enum(UserRole), default=UserRole.khach_hang)
@@ -159,9 +167,31 @@ class QuanTriVien(db.Model):
 class QuyDinhNhapSach(db.Model):
     __tablename__ = 'quy_dinh_nhap_sach'
     id = db.Column(db.Integer, primary_key=True)
-    so_luong_nhap_toi_thieu = db.Column(db.Integer)
-    so_luong_ton_toi_thieu = db.Column(db.Integer)
-    sach_id = db.Column(db.Integer, db.ForeignKey('sach.id'))
+    so_luong_nhap_toi_thieu = db.Column(db.Integer, nullable=False)
+    so_luong_ton_toi_thieu = db.Column(db.Integer, nullable=False)
+
+    @classmethod
+    def get_rules(cls):
+        return cls.query.first()  # Lấy quy định đầu tiên (có thể là quy định duy nhất)
+
+def create_default_rules():
+    # Kiểm tra nếu chưa có quy định nào
+    if not QuyDinhNhapSach.query.first():
+        # Tạo quy định mới với số lượng nhập tối thiểu 150 và số lượng tồn tối thiểu 300
+        default_rule = QuyDinhNhapSach(
+            so_luong_nhap_toi_thieu=150,
+            so_luong_ton_toi_thieu=300
+        )
+        db.session.add(default_rule)
+        db.session.commit()
+
+
+class QuyDinhHuyDon(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    thoi_gian_huy_don = db.Column(db.Integer, nullable=False)  # Thời gian hủy đơn hàng (giờ)
+
+
+
 
 if __name__ == '__main__':
     with app.app_context():
@@ -169,15 +199,39 @@ if __name__ == '__main__':
 
         nguoi_dung = NguoiDung(
             ten='Trịnh Đoàn Hậu',
-            username='doanhau',
+            username='admin',
             password=hashlib.md5('12345'.encode()).hexdigest(),
             email='trinhdoanhauu@gmail.com',
             sdt='0346469539',
             dia_chi='Hồ Chí Minh',
-            role=UserRole.quan_ly,
+            role=UserRole.quan_tri_vien,
             quan_ly=QuanLy()
         )
         db.session.add(nguoi_dung)
+
+        nguoi_dung2 = NguoiDung(
+            ten='Trịnh Đoàn Hậu',
+            username='doanhau',
+            password=hashlib.md5('12345'.encode()).hexdigest(),
+            email='trinhdoanhauu2@gmail.com',
+            sdt='0346469239',
+            dia_chi='Hồ Chí Minh',
+            role=UserRole.quan_ly_kho,
+            quan_ly=QuanLy()
+        )
+        db.session.add(nguoi_dung2)
+
+        quy_dinh_nhap_sach = QuyDinhNhapSach(
+            so_luong_nhap_toi_thieu='150',
+            so_luong_ton_toi_thieu='300'
+        )
+        db.session.add(quy_dinh_nhap_sach)
+
+        quy_dinh_huy_don = QuyDinhHuyDon(
+            thoi_gian_huy_don='48'
+        )
+        db.session.add(quy_dinh_huy_don)
+
 
         # Tạo 5 thể loại
         theloai_list = [
@@ -191,27 +245,27 @@ if __name__ == '__main__':
 
         sach_mau = [
             {'ten': 'Python Programming', 'gia': 150000, 'so_luong': 10,
-             'hinh_anh': 'https://images-na.ssl-images-amazon.com/images/I/81L3B8zRbYL.jpg', 'the_loai_id': 1,
+             'hinh_anh': 'https://res.cloudinary.com/dgeyq5bpg/image/upload/v1730552173/murachs-python-programming_rkokfs.jpg', 'the_loai_id': 1,
              'nxb': 'NXB Công Nghệ', 'tac_gia': 'John Zelle'},
 
             {'ten': 'JavaScript: The Good Parts', 'gia': 200000, 'so_luong': 5,
-             'hinh_anh': 'https://images-na.ssl-images-amazon.com/images/I/51Zt+N9GzZL.jpg', 'the_loai_id': 1,
+             'hinh_anh': 'https://res.cloudinary.com/dgeyq5bpg/image/upload/v1730552186/images_edazyh.jpg', 'the_loai_id': 1,
              'nxb': 'O\'Reilly Media', 'tac_gia': 'Douglas Crockford'},
 
             {'ten': 'Introduction to Algorithms', 'gia': 300000, 'so_luong': 7,
-             'hinh_anh': 'https://images-na.ssl-images-amazon.com/images/I/41WZW9G1miL.jpg', 'the_loai_id': 1,
+             'hinh_anh': 'https://res.cloudinary.com/dgeyq5bpg/image/upload/v1730552203/61ZYxrQEpCL._AC_UF1000_1000_QL80__ojcgdk.jpg', 'the_loai_id': 1,
              'nxb': 'MIT Press', 'tac_gia': 'Thomas H. Cormen'},
 
             {'ten': 'The Pragmatic Programmer', 'gia': 250000, 'so_luong': 4,
-             'hinh_anh': 'https://images-na.ssl-images-amazon.com/images/I/41j7u40g7PL.jpg', 'the_loai_id': 1,
+             'hinh_anh': 'https://res.cloudinary.com/dgeyq5bpg/image/upload/v1730552331/61ztlXgCmpL._AC_UF1000_1000_QL80__n5ofot.jpg', 'the_loai_id': 1,
              'nxb': 'Addison-Wesley', 'tac_gia': 'Andrew Hunt'},
 
             {'ten': 'Clean Code', 'gia': 220000, 'so_luong': 8,
-             'hinh_anh': 'https://images-na.ssl-images-amazon.com/images/I/51nF39mC5bL.jpg', 'the_loai_id': 1,
+             'hinh_anh': 'https://res.cloudinary.com/dgeyq5bpg/image/upload/v1730552331/61ztlXgCmpL._AC_UF1000_1000_QL80__n5ofot.jpg', 'the_loai_id': 1,
              'nxb': 'Prentice Hall', 'tac_gia': 'Robert C. Martin'},
 
             {'ten': 'Learning Python', 'gia': 180000, 'so_luong': 6,
-             'hinh_anh': 'https://images-na.ssl-images-amazon.com/images/I/51eZaqP1P2L.jpg', 'the_loai_id': 1,
+             'hinh_anh': 'https://res.cloudinary.com/dgeyq5bpg/image/upload/v1730552331/61ztlXgCmpL._AC_UF1000_1000_QL80__n5ofot.jpg', 'the_loai_id': 1,
              'nxb': 'O\'Reilly Media', 'tac_gia': 'Mark Lutz'},
 
             {'ten': 'Fluent Python', 'gia': 270000, 'so_luong': 5,

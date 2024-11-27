@@ -47,7 +47,7 @@ def lay_sach(kw=None, the_loai_id=None, trang=None):
         }
 
 
-def them_nguoi_dung(ten=None,username=None, password=None, sdt=None, email=None, dia_chi=None,hinh_anh =None, role=None):
+def them_nguoi_dung(ten=None,username=None, password=None, sdt=None, email=None, dia_chi=None, hinh_anh =None, role=None):
     password = str(hashlib.md5(password.encode('utf-8')).hexdigest())
     nguoi_dung = NguoiDung(ten=ten, username=username, password=password, sdt=sdt, email=email, dia_chi=dia_chi,hinh_anh=hinh_anh, role=role)
 
@@ -56,13 +56,13 @@ def them_nguoi_dung(ten=None,username=None, password=None, sdt=None, email=None,
 
 
 def them_khach_hang(ten=None,username=None, password=None, sdt=None, email=None, dia_chi=None, avatar=None):
-    nguoi_dung = them_nguoi_dung(ten, username, password, sdt, email, dia_chi, UserRole.khach_hang)
+    nguoi_dung = them_nguoi_dung(ten, username, password, sdt, email, dia_chi, avatar, UserRole.khach_hang)
     khach_hang = KhachHang(nguoi_dung=nguoi_dung)
 
     if avatar:
         res = cloudinary.uploader.upload(avatar)
         khach_hang.avatar = res['secure_url']
-
+        nguoi_dung.hinh_anh = res['secure_url']
     db.session.add(khach_hang)
     db.session.commit()
 
@@ -76,7 +76,6 @@ def chung_thuc_nguoi_dung(username=None, password=None):
 def lay_nguoi_dung_theo_id(id):
     return NguoiDung.query.get(id)
 
-
 def them_don_hang(gio_hang=None, khach_hang_id=None, nhan_vien_id=None):
     if gio_hang:
         khach_hang = lay_nguoi_dung_theo_id(khach_hang_id).khach_hang
@@ -86,18 +85,37 @@ def them_don_hang(gio_hang=None, khach_hang_id=None, nhan_vien_id=None):
         h = DonHang(khach_hang=khach_hang, nhan_vien=nhan_vien)
         db.session.add(h)
 
-        for g in gio_hang.values():
-            c = ChiTietDonHang(sach_id=g['id'], gia=g['gia'], so_luong=g['so_luong'], don_hang=h)
-            db.session.add(c)
-
         try:
+            for g in gio_hang.values():
+                sach = Sach.query.get(g['id'])
+                if not sach:
+                    raise Exception(f"Sách với ID {g['id']} không tồn tại.")
+
+                # Kiểm tra số lượng sách có đủ hay không
+                if sach.so_luong < g['so_luong']:
+                    raise Exception(f"Số lượng không đủ cho sách '{sach.ten}'.")
+
+                # Trừ số lượng sách trong kho
+                sach.so_luong -= g['so_luong']
+
+                # Thêm chi tiết đơn hàng
+                c = ChiTietDonHang(
+                    sach_id=g['id'],
+                    gia=g['gia'],
+                    so_luong=g['so_luong'],
+                    don_hang=h
+                )
+                db.session.add(c)
+
+            # Commit tất cả thay đổi
             db.session.commit()
-        except:
-            return False
-        else:
             return True
 
-    return False
+        except Exception as e:
+            db.session.rollback()  # Rollback nếu có lỗi
+            return str(e)  # Trả về lỗi cụ thể cho frontend
+
+    return "Giỏ hàng trống!"
 
 
 def lay_khach_hang_theo_sdt(sdt=None):

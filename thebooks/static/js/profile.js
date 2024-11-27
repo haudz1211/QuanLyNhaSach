@@ -6,22 +6,32 @@ function edit() {
 }
 
 function updateProfile() {
-    const image = document.getElementById('input-file').value
-    const hoTen = document.getElementById('ho-ten').value
-    const sdt = document.getElementById('sdt').value
-    const email = document.getElementById('email').value
-    const diaChi = document.getElementById('dia-chi').value
+    const inputFile = document.getElementById('input-file');
+    const hoTen = document.getElementById('ho-ten').value;
+    const sdt = document.getElementById('sdt').value;
+    const email = document.getElementById('email').value;
+    const diaChi = document.getElementById('dia-chi').value;
+
+    const formData = new FormData();
+    formData.append('ten', hoTen);
+    formData.append('sdt', sdt);
+    formData.append('email', email);
+    formData.append('dia_chi', diaChi);
+    if (inputFile.files[0]) {
+        formData.append('avatar', inputFile.files[0]);
+    }
 
     fetch('/api/khach_hang', {
-        method: 'put',
-        body: JSON.stringify({
-            'ten': hoTen,
-            'sdt': sdt,
-            'email': email,
-            'avatar': image,
-            'dia_chi': diaChi
-        }),
-        headers: {}
-
+        method: 'PUT',
+        body: formData
     })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Cập nhật hồ sơ thành công");
+        } else {
+            alert("Cập nhật hồ sơ thất bại");
+        }
+    })
+    .catch(error => console.error('Error:', error));
 }

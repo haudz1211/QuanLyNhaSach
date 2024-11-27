@@ -1,3 +1,4 @@
+// Thêm sách vào đơn hàng
 function addOrder() {
     let sachId = document.getElementById('sachId').value;
     fetch(`/api/don_hang/${sachId}`, {
@@ -38,6 +39,7 @@ function addOrder() {
     .catch(error => console.error('Error:', error));
 }
 
+// Cập nhật số lượng trong đơn hàng
 function updateOrder(id, obj) {
     obj.disabled = true;
 
@@ -64,6 +66,7 @@ function updateOrder(id, obj) {
     });
 }
 
+// Xóa sách khỏi đơn hàng
 function deleteOrder(id, obj) {
     obj.disabled = true;
 
@@ -80,7 +83,7 @@ function deleteOrder(id, obj) {
 
         let bookItem = document.getElementById(`book${id}`);
         if (bookItem) {
-            bookItem.remove(); // Xóa sách khỏi bảng
+            bookItem.remove();
         }
     })
     .catch(error => {
@@ -89,6 +92,7 @@ function deleteOrder(id, obj) {
     });
 }
 
+// Tìm khách hàng
 function findCustomer() {
     let sdt = document.getElementById('phone').value;
     fetch(`/api/khach_hang/${sdt}`, {
@@ -112,20 +116,32 @@ function findCustomer() {
     .catch(error => console.error('Error:', error));
 }
 
-function pay() {
-    let item = document.getElementById('khach-hang-id').innerText;
-    let khachHangId = parseInt(item);
+// Thanh toán tiền mặt
+function payWithCash() {
+    let receivedAmount = prompt("Nhập số tiền khách đã đưa:");
+    receivedAmount = parseFloat(receivedAmount);
+    let totalAmount = parseFloat(document.getElementById('order-amount').innerText.replace(/[^0-9.-]+/g, ""));
+
+    if (isNaN(receivedAmount) || receivedAmount < totalAmount) {
+        alert('Số tiền nhận không đủ để thanh toán.');
+        return;
+    }
+
+    let balance = receivedAmount - totalAmount;
+    alert(`Số dư trả lại khách: ${balance.toLocaleString()} VNĐ`);
 
     fetch('/api/don_hang/dat_hang', {
         method: 'POST',
-        body: JSON.stringify({ 'khach_hang_id': khachHangId }),
+        body: JSON.stringify({
+            'khach_hang_id': parseInt(document.getElementById('khach-hang-id').innerText),
+            'payment_method': 'TienMat'
+        }),
         headers: {
             'Content-Type': 'application/json'
         }
     })
     .then(res => res.json())
     .then(data => {
-        console.log(data);  // In log dữ liệu để kiểm tra
         if (data.status === 200) {
             alert('Đặt hàng thành công');
             location.reload();
@@ -136,32 +152,32 @@ function pay() {
     .catch(error => console.error('Error:', error));
 }
 
-
+// Thanh toán qua MoMo
 function payWithMoMo() {
-    console.log('Nút thanh toán MoMo đã được click.');
-    let item = document.getElementById('khach-hang-id').innerText;
-    let khachHangId = parseInt(item);
+    let khachHangId = parseInt(document.getElementById('khach-hang-id').innerText);
 
-    // Giả sử bạn đã có thông tin đơn hàng cần thiết
     fetch('/api/don_hang/dat_hang', {
         method: 'POST',
         body: JSON.stringify({
             'khach_hang_id': khachHangId,
-            'payment_method': 'MoMo' // Thêm phương thức thanh toán
+            'payment_method': 'MoMo'
         }),
         headers: {
             'Content-Type': 'application/json'
         }
     })
-    .then(res => res.json())
+    .then(res => {
+        console.log("Response status:", res.status);
+        return res.json();
+    })
     .then(data => {
-        console.log(data);  // In log dữ liệu để kiểm tra
-        if (data.status === 200) {
-            // Giả sử bạn cần chuyển hướng đến trang thanh toán MoMo
-            window.location.href = data.payment_url; // URL thanh toán từ server
+        console.log("Response data:", data);
+        if (data.status === 200 && data.payment_url) {
+            window.location.href = data.payment_url;
         } else {
             alert(data.error_message || 'Thanh toán không thành công');
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => console.error('Fetch error:', error));
 }
+

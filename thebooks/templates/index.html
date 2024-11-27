@@ -111,9 +111,12 @@
     <div class="row mt-2 justify-content-center">
         {% for s in sach %}
         <div class="book-card col-xs-12 col-md-3 card shadow pt-3 m-2 bg-body rounded" style="width: 18rem;">
-           <img src="{{ s.hinh_anh }}" class="book-img card-img-top align-self-center" alt="{{ s.ten }}">
+    {#           <a href="/sach/{{s.id}}">#}
+    {#            <img  src="{{ s.hinh_anh }}" class="book-img card-img-top align-self-center" alt="{{ s.ten }}">#}
+    {#           </a>#}
+            <img  src="{{ s.hinh_anh }}" class="book-img card-img-top align-self-center" alt="{{ s.ten }}">
 
-            <div class="card-body">
+            <div class="card-body"  >
                 <h5 class="card-title">{{ s.ten }}</h5>
                 <p class="card-text">{{ s.gia }} VNĐ</p>
                 <a href="/sach/{{s.id}}" class="btn btn-primary">chi tiết</a>

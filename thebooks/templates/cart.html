@@ -1,58 +1,137 @@
-{% extends 'layout/base.html' %}
+    {% extends 'layout/base.html' %}
 
-{% block title %} Giỏ hàng {% endblock %}
-{% block content %}
-<div class="my-4">
-    {% if 'gio_hang' in session %}
-    <div class="row py-2 fs-5 fw-bold">
-        <div class="col-md-2 me-4" style="width: 10rem;">Sản phẩm</div>
-        <div class="col-md-4 row"></div>
-        <div class="col-md-2">Đơn giá</div>
-        <div class="col-md-3">Số lượng</div>
-        <div class="col-md-1"></div>
-    </div>
-    {% for g in session['gio_hang'].values() %}
-    <div id="book{{ g.id }}" class="row py-3 mb-4 shadow-sm bg-body-tertiary rounded align-items-center">
-        <div class="col-md-2 me-4" style="width: 10rem;"><img class="w-100" src="{{ g.hinh_anh }}"></div>
-        <div class="col-md-4 row align-content-center">
-            <span class="py-2 col-md-12">Tên: {{ g.ten }}</span>
-            <span class="py-2 col-md-12">Thể loại: {{ g.the_loai }}</span>
-            <span class="py-2 col-md-12">Tác giả: {{ g.tac_gia }}
-                {% for t in g.tac_gias %}
-                <span>{{ t.ten }}</span>
-                {% endfor %}
-            </span>
+    {% block title %} Giỏ hàng {% endblock %}
+    {% block content %}
+    <div class="my-4">
+        {% if 'gio_hang' in session %}
+        <div class="row py-2 fs-5 fw-bold">
+            <div class="col-md-2 me-4" style="width: 10rem;">Sản phẩm</div>
+            <div class="col-md-4 row"></div>
+            <div class="col-md-2">Đơn giá</div>
+            <div class="col-md-3">Số lượng</div>
+            <div class="col-md-1"></div>
         </div>
-        <div class="col-md-2">{{ "{:,.0f}".format(g.gia) }} VNĐ</div>
-        <div class="col-md-3">
-            <input type="number" onblur="updateCart({{ g.id }}, this)" value="{{ g.so_luong }}"
-                   class="form-control w-auto"/>
+        {% for g in session['gio_hang'].values() %}
+        <div id="book{{ g.id }}" class="row py-3 mb-4 shadow-sm bg-body-tertiary rounded align-items-center">
+            <div class="col-md-2 me-4" style="width: 10rem;"><img class="w-100" src="{{ g.hinh_anh }}"></div>
+            <div class="col-md-4 row align-content-center">
+                <span class="py-2 col-md-12">Tên: {{ g.ten }}</span>
+                <span class="py-2 col-md-12">Thể loại: {{ g.the_loai }}</span>
+                <span class="py-2 col-md-12">Tác giả: {{ g.tac_gia }}
+                    {% for t in g.tac_gias %}
+                    <span>{{ t.ten }}</span>
+                    {% endfor %}
+                </span>
+            </div>
+            <div class="col-md-2">{{ "{:,.0f}".format(g.gia) }} VNĐ</div>
+            <div class="col-md-3">
+                <input type="number" onblur="updateCart({{ g.id }}, this)" value="{{ g.so_luong }}"
+                       class="form-control w-auto"/>
+            </div>
+            <div class="col-md-1 justify-content-end">
+                <button class="btn btn-danger" onclick="deleteCart({{ g.id }}, this)">&times;</button>
+            </div>
         </div>
-        <div class="col-md-1 justify-content-end">
-            <button class="btn btn-danger" onclick="deleteCart({{ g.id }}, this)">&times;</button>
-        </div>
-    </div>
-    {% endfor %}
+        {% endfor %}
 
-    <div class="alert alert-info">
-        <h3>Tổng tiền: <span class="cart-amount">{{ "{:,.0f}".format(thong_tin_gio_hang.tong_tien) }}</span> VNĐ
-        </h3>
-        <h3>Tổng số lượng: <span class="cart-count">{{ thong_tin_gio_hang.tong_so_luong }}</span></h3>
-    </div>
+        <div class="alert alert-info">
+            <h3>Tổng tiền: <span class="cart-amount">{{ "{:,.0f}".format(thong_tin_gio_hang.tong_tien) }}</span> VNĐ
+            </h3>
+            <h3>Tổng số lượng: <span class="cart-count">{{ thong_tin_gio_hang.tong_so_luong }}</span></h3>
+        </div>
 
-    <div>
-        {% if current_user.is_authenticated %}
-        <input type="button" onclick="pay()" value="Thanh toán" class="btn btn-success"/>
+        <div>
+            {% if current_user.is_authenticated %}
+            <input type="button" onclick="openPaymentModal()" value="Thanh toán" class="btn btn-success"/>
+            {% else %}
+            <p>Vui lòng <a href="/login?next=/cart">đăng nhập</a> để thanh toán!</p>
+            {% endif %}
+        </div>
+
+
         {% else %}
-        <p>Vui lòng <a href="/login?next=/cart">đăng nhập</a> để thanh toán!</p>
+        <div class="alert alert-info">KHÔNG có sản phẩm trong giỏ!</div>
         {% endif %}
     </div>
-    {% else %}
-    <div class="alert alert-info">KHÔNG có sản phẩm trong giỏ!</div>
-    {% endif %}
-</div>
-{% endblock %}
 
-{% block js %}
-<script src="{{ url_for('static', filename='js/cart.js') }}"></script>
-{% endblock %}
+    <!-- Modal Chọn Phương Thức Thanh Toán -->
+    <div class="modal fade" id="paymentMethodModal" tabindex="-1" aria-labelledby="paymentMethodLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="paymentMethodLabel">Chọn phương thức thanh toán</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="paymentForm">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="cash" value="cash" checked onclick="toggleCashFields(true)">
+                <label class="form-check-label" for="cash">Tiền mặt</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="momo" value="momo" onclick="toggleCashFields(false)">
+                <label class="form-check-label" for="momo">Chuyển khoản Momo</label>
+              </div>
+
+              <!-- Nhập số tiền nhận (chỉ hiện khi chọn Tiền mặt) -->
+              <div id="cashFields" class="mt-3" style="display: none;">
+                <div class="mb-3">
+                  <label for="receivedAmount" class="form-label">Số tiền nhận:</label>
+                  <input type="number" class="form-control" id="receivedAmount" oninput="calculateBalance()">
+                </div>
+                <p>Số dư phải trả: <span id="balanceAmount">0</span> VNĐ</p>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="button" class="btn btn-primary" onclick="confirmPayment()">Xác nhận</button>
+          </div>
+        </div>
+      </div>
+    </div>
+<div id="error-message" class="error-message" style="display: none;"></div>
+
+    {% endblock %}
+
+    {% block js %}
+    <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+    <script>
+    function openPaymentModal() {
+        var modal = new bootstrap.Modal(document.getElementById('paymentMethodModal'));
+        modal.show();
+    }
+
+    function toggleCashConfirmation(show) {
+        document.getElementById('cashConfirmation').style.display = show ? 'block' : 'none';
+    }
+
+    function confirmPayment() {
+        const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+        // Kiểm tra nếu chọn "Tiền mặt" thì phải xác nhận "Đã nhận tiền"
+        if (paymentMethod === 'cash' && !document.getElementById('confirmCashReceived').checked) {
+            alert('Vui lòng xác nhận đã nhận tiền trước khi thanh toán.');
+            return;
+        }
+
+        fetch('/api/dat_hang', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ payment_method: paymentMethod })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 200) {
+                alert('Thanh toán thành công!');
+                window.location.href = '/';
+            } else {
+                alert('Có lỗi xảy ra trong quá trình thanh toán: ' + data.error_message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    </script>
+    {% endblock %}

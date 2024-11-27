@@ -38,7 +38,7 @@ def upload_image_to_cloudinary(image_file):
 db = SQLAlchemy(app=app)
 login_manager = LoginManager(app=app)
 
-admin = Admin(app=app, name='Quản trị TheBooks', template_mode='bootstrap4')
+admin = Admin(app=app, name='Quản trị BOOKSTORE', template_mode='bootstrap4')
 def create_database_if_not_exists():
     engine = create_engine('mysql+pymysql://root:Admin%40123@localhost/?charset=utf8mb4')
     with engine.connect() as connection:
