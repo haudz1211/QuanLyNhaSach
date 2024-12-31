@@ -129,7 +129,7 @@ function pay() {
     });
 }
 
-function payAdmin() {
+function spayAdmin() {
     // Lấy thông tin số điện thoại và tổng tiền từ trang admin
     let phone = document.getElementById('admin-phone').value;  // Số điện thoại khách hàng
     let orderAmount = document.getElementById('admin-order-amount').innerText.replace(' VNĐ', '').replace(',', ''); // Tổng tiền
