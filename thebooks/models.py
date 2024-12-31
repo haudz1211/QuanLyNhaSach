@@ -83,10 +83,10 @@ class BinhLuan(db.Model):
 
 class UserRole(enum.Enum):
     quan_tri_vien = 1
-    # quan_ly = 2
-    quan_ly_kho = 2
-    nhan_vien = 3
-    khach_hang = 4
+    quan_ly = 2
+    quan_ly_kho = 3
+    nhan_vien = 4
+    khach_hang = 5
 
 
 class NguoiDung(BaseModel, UserMixin):

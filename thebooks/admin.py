@@ -28,7 +28,7 @@ class AuthenticatedQuanLyKho(MyView):
 
 class AuthenticatedQuanLy(MyView):
     def is_accessible(self):
-        return current_user.is_authenticated and current_user.role == UserRole.quan_ly_kho
+        return current_user.is_authenticated and current_user.role == UserRole.quan_ly
 
 
 class AuthenticatedQuanTri(BaseView):
@@ -46,6 +46,7 @@ from flask import flash
 class SachView(AuthenticatedQuanLy):
     column_list = ['id', 'ten', 'gia', 'so_luong', 'the_loai', 'tac_gia', 'nxb', 'hinh_anh']
     form_columns = ['ten', 'gia', 'so_luong', 'the_loai_id', 'tac_gia', 'nxb', 'hinh_anh', 'active']
+
 
     form_extra_fields = {
         'the_loai_id': QuerySelectField(
@@ -237,39 +238,39 @@ class QuanLyKhoView(AuthenticatedQuanLy):
     }
 
 
-class QuanTriView(AuthenticatedQuanLy):
-    column_list = ['id', 'nguoi_dung']
-    form_columns = ['nguoi_dung_id']
-    form_extra_fields = {
-        'nguoi_dung_id': QuerySelectField(
-            'Người Dùng',
-            query_factory=lambda: NguoiDung.query.all(),
-            get_label='ten',
-            allow_blank=False
-        )
-    }
-
-    def on_model_change(self, form, model, is_created):
-        # Lấy ID của người dùng từ form
-        nguoi_dung_id = form.nguoi_dung_id.data.id  # Lấy ID từ đối tượng NguoiDung được chọn
-
-        # Kiểm tra xem ID có hợp lệ không
-        if nguoi_dung_id:
-            model.nguoi_dung_id = nguoi_dung_id  # Gán ID của nguoi_dung cho model
-        else:
-            flash("Người dùng không tồn tại.", "danger")
-            return  # Ngăn không cho tiếp tục xử lý
-
-        # Các xử lý khác...
-
-        db.session.add(model)
-        db.session.commit()  # Lưu thay đổi vào cơ sở dữ liệu
+# class QuanTriView(AuthenticatedQuanLy):
+#     column_list = ['id', 'nguoi_dung']
+#     form_columns = ['nguoi_dung_id']
+#     form_extra_fields = {
+#         'nguoi_dung_id': QuerySelectField(
+#             'Người Dùng',
+#             query_factory=lambda: NguoiDung.query.all(),
+#             get_label='ten',
+#             allow_blank=False
+#         )
+#     }
+#
+#     def on_model_change(self, form, model, is_created):
+#         # Lấy ID của người dùng từ form
+#         nguoi_dung_id = form.nguoi_dung_id.data.id  # Lấy ID từ đối tượng NguoiDung được chọn
+#
+#         # Kiểm tra xem ID có hợp lệ không
+#         if nguoi_dung_id:
+#             model.nguoi_dung_id = nguoi_dung_id  # Gán ID của nguoi_dung cho model
+#         else:
+#             flash("Người dùng không tồn tại.", "danger")
+#             return  # Ngăn không cho tiếp tục xử lý
+#
+#         # Các xử lý khác...
+#
+#         db.session.add(model)
+#         db.session.commit()  # Lưu thay đổi vào cơ sở dữ liệu
 
 
 # class KhachHangView(AuthenticatedQuanLy):
 #     pass
 
-
+#
 class NguoiDungView(AuthenticatedQuanLy):
     pass
 
@@ -280,20 +281,31 @@ class LogoutView(BaseView):
         logout_user()
         return redirect('/admin')
 
-
+# quản lí
 admin.add_view(SachView(Sach, db.session))
 admin.add_view(TheLoaiView(TheLoai, db.session))
-admin.add_view(PhieuNhapView(PhieuNhap, db.session))
-admin.add_view(ChiTietPhieuNhapView(ChiTietPhieuNhap, db.session))
-admin.add_view(NhanVienView(NhanVien, db.session))
-admin.add_view(QuanLyView(QuanLy, db.session))
-admin.add_view(QuanTriView(QuanTriVien, db.session))
-admin.add_view(QuanLyKhoView(QuanLyKho, db.session))
-admin.add_view(KhachHangView(KhachHang, db.session))
-admin.add_view(NguoiDungView(NguoiDung, db.session))
 admin.add_view(QuyDinhNhapSachView(QuyDinhNhapSach, db.session))
 
+#quản lý kho
+admin.add_view(PhieuNhapView(PhieuNhap, db.session))
+admin.add_view(ChiTietPhieuNhapView(ChiTietPhieuNhap, db.session))
+
+# admin.add_view(NhanVienView(NhanVien, db.session))
+# admin.add_view(QuanLyView(QuanLy, db.session))
+# # admin.add_view(QuanTriView(QuanTriVien, db.session))
+# admin.add_view(QuanLyKhoView(QuanLyKho, db.session))
+# admin.add_view(KhachHangView(KhachHang, db.session))
+
+
+# nhân viên
 admin.add_view(BanSachView(name='Bán sách'))
+
+
+# quản trị
 admin.add_view(ThongKeTheoDoanhThuView(name='Thống kê theo doanh thu'))
 admin.add_view(ThongKeTheoTanSuatView(name='Thống kê theo tần suất'))
+
+admin.add_view(NguoiDungView(NguoiDung, db.session))
+
+
 admin.add_view(LogoutView(name='Logout'))
